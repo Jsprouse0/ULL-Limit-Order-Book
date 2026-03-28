@@ -9,7 +9,7 @@
 #include "core/book.hpp"
 #include "core/events.hpp"
 #include "utils/ringbuffer.hpp"
-#include "utils/time.hpp"
+#include "utils/benchmark.hpp"
 
 using namespace lob;
 
@@ -34,17 +34,22 @@ BacktestConfig load_config(const std::string& path) {
     std::string line;
     while (std::getline(in, line)) {
         if (line.empty() || line[0] == '#') continue;
+
         auto pos = line.find(':');
         if (pos == std::string::npos) continue;
+
         std::string key = line.substr(0, pos);
         std::string val = line.substr(pos + 1);
+
         auto trim = [](std::string& s) {
             std::size_t b = s.find_first_not_of(" \t");
             std::size_t e = s.find_last_not_of(" \t");
             if (b == std::string::npos) { s.clear(); return; }
             s = s.substr(b, e - b + 1);
         };
+
         trim(key); trim(val);
+
         if (key == "symbol") cfg.symbol = val;
         else if (key == "steps") cfg.steps = static_cast<std::size_t>(std::stoull(val));
         else if (key == "mid_price") cfg.mid_price = std::stod(val);
@@ -53,6 +58,7 @@ BacktestConfig load_config(const std::string& path) {
         else if (key == "mm_size") cfg.mm_size = std::stod(val);
         else if (key == "seed") cfg.seed = static_cast<unsigned>(std::stoul(val));
     }
+
     return cfg;
 }
 
